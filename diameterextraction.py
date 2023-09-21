@@ -18,9 +18,10 @@ trees = [[8.45, 11.1], [7.95, 11.4], [10.5, 11.7], [10.25, 14.7], [11.55, 17.5],
 
 """
 
+
 params = dict()
 # heights = np.random.randint(5,50, 40)
-heights = np.linspace(5, 50, 40)
+heights = np.linspace(-5, 25, 40)
 
 treeas = np.array([[8.45, 11.1],
                    [7.95, 11.4],
@@ -95,12 +96,11 @@ def getDiams():
         print(diam, diam_exp, diam_poly, height)
 
     d = np.array(d)
-    """
+
     plt.scatter(d[:,0],d[:,1], color='r')
     plt.scatter(d[:,0],d[:,2], color='g')
     plt.scatter(d[:,0],d[:,3], color='y')
     plt.scatter(treeas[:,0],treeas[:,1], color='b')
 
     plt.show()
-    """
     return d

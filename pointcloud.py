@@ -16,7 +16,7 @@ class PointCloud:
 
     def getFloor(self, coordinates: list, radius=15):
         for i, dot in enumerate(self.las):
-            if abs(coordinates[0]-dot[i,0])<radius and abs(coordinates[1]-dot[i,1])<radius:
+            if abs(coordinates[0]-dot[:,0])<radius and abs(coordinates[1]-dot[:,1])<radius:
                 return dot[2]
             else: return 0
 

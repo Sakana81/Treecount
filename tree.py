@@ -1,3 +1,5 @@
+from species import Species
+
 class Tree:
 
     def addDiameters(self, diameters: list):
@@ -10,11 +12,11 @@ class Tree:
     def addHeight(self, height: float):
         self.height = height
 
-    def addSpecies(self, species: str):
-        self.species = species
+    def addSpecies(self, species: Species):
+        self.species = species.name
 
-    def getSpecies(self, function_params: list):
-        pass
+    def getSpecies(self):
+        return self.species
 
     def __init__(self, x: float, y: float, z_top: float, z_bottom: float, scaler: float):
         self.diameters = list()

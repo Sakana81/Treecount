@@ -56,6 +56,9 @@ class Image:
             cv2.imshow('Dominant colors', img_bar)
             cv2.waitKey(0)
 
+    def getColorByCoordinates(self, x: int, y: int):
+        return self.imgRGB[x,y]
+
     def plot(self):
         plt.imshow(self.imgRGB)
         plt.show()
