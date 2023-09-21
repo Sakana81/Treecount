@@ -32,7 +32,7 @@ class Image:
 
     def getPalette(self, number_colors=5, display=False):
 
-        data = np.reshape(self.imgRGB, (self.img.shape[0] * self.imgRGB.shape[1], self.imgRGB.shape[2]))
+        data = np.reshape(self.imgRGB, (self.imgRGB.shape[0] * self.imgRGB.shape[1], self.imgRGB.shape[2]))
         data = data[~np.all(data == 0, axis=1)]
 
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
