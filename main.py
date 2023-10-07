@@ -1,56 +1,56 @@
-
+import matplotlib.pyplot as plt
+import numpy as np
 
 from cuttingArea import CuttingArea
 import diameterextraction
-import matplotlib.pyplot as plt
+import heightextraction
 
-import numpy as np
-from sklearn import linear_model
-import open3d as o3d
-
-def separateGround(las):
-    ground_dots = np.empty(0)
-    dots_sorted_by_z = las[las[:, 2].argsort()]
-    a = np.hsplit(dots_sorted_by_z, 3)
-    b = np.hstack((a[0], a[1]))
-
-    ransac = linear_model.RANSACRegressor()
-    ransac.fit(b, a[2])
-    inlier_mask = ransac.inlier_mask_
-    d = np.hstack((a[2], inlier_mask))
-    c = np.hstack((b, d))
-    c = c[c[4] == True]
-    geom = o3d.geometry.PointCloud()
-    geom.points = o3d.utility.Vector3dVector(c)
-    o3d.visualization.draw_geometries([geom])
-
-    print(c)
-    return c
 
 def main():
     impath = 'C:\\Users\pickles\Downloads\pp_nrgb_cut\pp1_nrgb_cut.tif'
     laspath = 'C:\\Users\pickles\Downloads\PP_Yusva_03052022\PP_Yusva_03052022\pp_1.las'
 
-    probe = CuttingArea(impath, [3,2,7], laspath)
-    # probe.pointcloud.makeSlice(15, 15)
-    # probe.pointcloud.showPointCloud()
-    # probe.pointcloud.plot_o3d()
-    #s = separateGround(probe.pointcloud.las)
-    probe.image.getPalette(number_colors=5,display=True)
+    probe = CuttingArea(impath, [3, 2, 7], laspath)
+
+    # probe.image.getPalette(number_colors=5,display=True)
     centers, clusters = probe.pointcloud.getMax(radius=10, eps=7, min_samples=10, divider=15, num_slice=15)
+    z_min = probe.pointcloud.getFloor(radius=15)
+    sea_level_height = min(z_min[:, 2])
 
-    for i in centers:
-        z_min = probe.pointcloud.getFloor([i[0],i[1]], radius=50)
-        print(i[2],z_min,i[2]-z_min)
+    # Я не знаю в каких величинах извлекается высота, на тесте высота всех деревьев была примерно 300 условных единиц.
+    # НЕОБХОДИМО ИЗМЕНИТЬ ЭТОТ ПАРАМЕТР
+    height_scaler = 20
 
+    heights = map(lambda x: x / height_scaler, heightextraction.getHeight(centers, z_min, sea_level_height))
 
+    # ЭТО ДЛЯ ПРИМЕРА! необходимо подгружать от пользователя в таком же формате: [[диаметр (см), высота(м)],[диаметр(см), высота(м)],...]
+    model_trees = np.array([[8.45, 11.1],
+                            [7.95, 11.4],
+                            [10.5, 11.7],
+                            [10.25, 14.7],
+                            [11.55, 17.5],
+                            [12, 12.4],
+                            [14.4, 15.5],
+                            [13.5, 12.5],
+                            [17.5, 21.3],
+                            [17.4, 20.8],
+                            [18.65, 21.3],
+                            [18.5, 21],
+                            [21.35, 20],
+                            [22.5, 22.3],
+                            [25.1, 21.1],
+                            [25.45, 25],
+                            [26.2, 24.6],
+                            [27.5, 24]])
+
+    # Здесь будет результат, формат можно глянуть в описании diameterextraction.getDiams()
+    diameters_and_height = diameterextraction.getDiams(model_trees, heights)
+    # print(diameters_and_height)
 
     plt.scatter(centers[:, 0], centers[:, 1], color='r')
     plt.show()
-    probe.image.plot()
-    # diameterextraction.getDiams()
+    # probe.image.plot()
 
 
 if __name__ == '__main__':
-    #diameterextraction.getDiams()
     main()

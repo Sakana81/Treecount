@@ -21,7 +21,7 @@ trees = [[8.45, 11.1], [7.95, 11.4], [10.5, 11.7], [10.25, 14.7], [11.55, 17.5],
 
 params = dict()
 # heights = np.random.randint(5,50, 40)
-heights = np.linspace(-5, 25, 40)
+# heights = np.linspace(-5, 25, 40)
 
 treeas = np.array([[8.45, 11.1],
                    [7.95, 11.4],
@@ -78,29 +78,34 @@ def getFunc(trees: np.array, func):
     return a, b
 
 
-def getDiams():
-    x = treeas[:,0]
-    y = treeas[:,1]
+def getDiams(model_trees, heights):
+    """
+    :param model_trees: Тут передаем деревья списком, в формате [[диаметр, высота],[диаметр, высота],...]
+    :param heights: Тут передаем уже извлеченные высоты деревьев списком
+    :return: Возвращает массив в формате [диаметр по логарифмической ф-ции, диаметр по экспоненциальной ф-ции, диаметр по полигональной ф-ции, высота дерева]
+    """
+    x = model_trees[:,0]
+    y = model_trees[:,1]
     a, b = getFunc(treeas, log)
     #plt.scatter(a,b)
     #plt.show()
     a1, b1 = getFunc(treeas, exp)
     a2 = poly(x,y)
-    print('diam','diam_exp', 'diam_poly', 'height')
+    # print('diam','diam_exp', 'diam_poly', 'height')
     d = []
     for height in heights:
         diam = a * np.log(height) + b
         diam_exp = a1 * np.exp(b1 * height)
         diam_poly = a2[0]*pow(height,3) + a2[1]*pow(height,2) + a2[2]*height + a2[3]
         d.append([height,diam,diam_exp, diam_poly])
-        print(diam, diam_exp, diam_poly, height)
+        # print(diam, diam_exp, diam_poly, height)
 
     d = np.array(d)
 
     plt.scatter(d[:,0],d[:,1], color='r')
     plt.scatter(d[:,0],d[:,2], color='g')
     plt.scatter(d[:,0],d[:,3], color='y')
-    plt.scatter(treeas[:,0],treeas[:,1], color='b')
+    plt.scatter(model_trees[:,0],model_trees[:,1], color='b')
 
     plt.show()
     return d
