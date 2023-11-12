@@ -1,28 +1,20 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.cluster import KMeans
 
-from cuttingArea import CuttingArea
+from classes.cuttingArea import CuttingArea
+from classes.tree import Tree
 import diameterextraction
 import heightextraction
 
 
 def main():
-    impath = 'C:\\Users\pickles\Downloads\pp_nrgb_cut\pp1_nrgb_cut.tif'
-    laspath = 'C:\\Users\pickles\Downloads\PP_Yusva_03052022\PP_Yusva_03052022\pp_1.las'
-
-    probe = CuttingArea(impath, [3, 2, 7], laspath)
-
-    # probe.image.getPalette(number_colors=5,display=True)
-    centers, clusters = probe.pointcloud.getMax(radius=10, eps=7, min_samples=10, divider=15, num_slice=15)
-    z_min = probe.pointcloud.getFloor(radius=15)
-    sea_level_height = min(z_min[:, 2])
-
-    # Я не знаю в каких величинах извлекается высота, на тесте высота всех деревьев была примерно 300 условных единиц.
-    # НЕОБХОДИМО ИЗМЕНИТЬ ЭТОТ ПАРАМЕТР
-    height_scaler = 20
-
-    heights = map(lambda x: x / height_scaler, heightextraction.getHeight(centers, z_min, sea_level_height))
-
+    #impath = 'C:\\Users\pickles\Downloads\pp_nrgb_cut\pp1_nrgb_cut.tif'
+    #laspath = 'C:\\Users\pickles\Downloads\PP_Yusva_03052022\PP_Yusva_03052022\pp_1.las'
+    impath = 'C:\\Users\pickles\Downloads\Telegram Desktop\LYSVA_RGB_NIR_9\LYSVA_RGB_NIR_9.tif'
+    laspath = 'C:\\Users\pickles\Downloads\Telegram Desktop\LYSVA_RGB_NIR_9\Lysva_may_PP9_D_G_O.las'
+    las_to_tiff_scaler = 10
+    number_of_colors = 5
     # ЭТО ДЛЯ ПРИМЕРА! необходимо подгружать от пользователя в таком же формате: [[диаметр (см), высота(м)],[диаметр(см), высота(м)],...]
     model_trees = np.array([[8.45, 11.1],
                             [7.95, 11.4],
@@ -43,13 +35,42 @@ def main():
                             [26.2, 24.6],
                             [27.5, 24]])
 
-    # Здесь будет результат, формат можно глянуть в описании diameterextraction.getDiams()
-    diameters_and_height = diameterextraction.getDiams(model_trees, heights)
-    # print(diameters_and_height)
+    probe = CuttingArea(impath, [3, 2, 7], laspath, las_to_tiff_scaler)
+    probe.image.getPalette(number_colors=number_of_colors, display=False)
 
-    plt.scatter(centers[:, 0], centers[:, 1], color='r')
+    centers, clusters = probe.pointcloud.getMax(radius=10, eps=7, min_samples=10, divider=15, num_slice=15)
+    z_min = probe.pointcloud.getFloor(radius=1.5)
+    sea_level_height = 0
+
+    for i, color in enumerate(probe.image.dominantColors):
+        probe.add_species(f'{i}', color)
+    species_classifier = KMeans(len(probe.get_species_colors())).fit(probe.get_species_colors())
+
+    d1 = []
+    d2 = []
+    d3 = []
+    h = []
+    params = diameterextraction.get_params(model_trees)
+    for center in centers:
+        height = heightextraction.get_height(center, z_min, sea_level_height, radius=5)
+        h.append(height)
+        diams = diameterextraction.fit_tree(height, params)
+        d1.append(diams[0])
+        d2.append(diams[1])
+        d3.append(diams[2])
+        tree_color = probe.image.getColorByCoordinates(center[0],center[1])
+        species = species_classifier.predict(tree_color)
+        tree = Tree(center, height, diams[0], diams[1], diams[2])
+        tree.addSpecies(species)
+        probe.trees.append(tree)
+        print(tree)
+    print(len(probe.trees))
+
+    plt.scatter(d1,h, color='r')
+    plt.scatter(d2,h, color='g')
+    plt.scatter(d3,h, color='b')
     plt.show()
-    # probe.image.plot()
+    #probe.image.plot()
 
 
 if __name__ == '__main__':

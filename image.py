@@ -18,6 +18,19 @@ class Image:
     meanColor = np.array()
     """
 
+    def __init__(self, path2img: str, channels=None):
+        if channels is None:
+            channels = [1, 2, 3]
+
+        with rasterio.open(path2img) as source:
+            bands = source.read()
+
+        self.img = bands
+        self.imgRGB = self.selectChannels(channels)
+        self.meanColor = list()
+        self.dominantColors = list()
+        self.size = [self.img.shape[1], self.img.shape[2]]
+
     def selectChannels(self, channels):
         def normalize(array):
             array_min, array_max = array.min(), array.max()
@@ -63,14 +76,4 @@ class Image:
         plt.imshow(self.imgRGB)
         plt.show()
 
-    def __init__(self, path2img: str, channels=None):
-        if channels is None:
-            channels = [1, 2, 3]
 
-        with rasterio.open(path2img) as source:
-            bands = source.read()
-
-        self.img = bands
-        self.imgRGB = self.selectChannels(channels)
-        self.meanColor = list()
-        self.dominantColors = list()
