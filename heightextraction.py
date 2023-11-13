@@ -10,10 +10,7 @@ def get_height(center, z_min, sea_level_height, radius=5):
     guessed_height = []
     top_elevation = center[2]
     for bottom_point in z_min:
-
-        diff_x = center[0] - bottom_point[0]
-        diff_y = center[1] - bottom_point[1]
-        if abs(diff_x) < radius and abs(diff_y) < radius:
+        if abs(center[0] - bottom_point[0]) < radius and abs(center[1] - bottom_point[1]) < radius:
             guessed_height.append(bottom_point[2])
 
     if not guessed_height:
