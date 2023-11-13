@@ -9,10 +9,10 @@ import heightextraction
 
 
 def main():
-    #impath = 'C:\\Users\pickles\Downloads\pp_nrgb_cut\pp1_nrgb_cut.tif'
-    #laspath = 'C:\\Users\pickles\Downloads\PP_Yusva_03052022\PP_Yusva_03052022\pp_1.las'
-    impath = 'C:\\Users\pickles\Downloads\Telegram Desktop\LYSVA_RGB_NIR_9\LYSVA_RGB_NIR_9.tif'
-    laspath = 'C:\\Users\pickles\Downloads\Telegram Desktop\LYSVA_RGB_NIR_9\Lysva_may_PP9_D_G_O.las'
+    #impath = ''
+    #laspath = ''
+    impath = ''
+    laspath = ''
     las_to_tiff_scaler = 10
     number_of_colors = 5
     # ЭТО ДЛЯ ПРИМЕРА! необходимо подгружать от пользователя в таком же формате: [[диаметр (см), высота(м)],[диаметр(см), высота(м)],...]
