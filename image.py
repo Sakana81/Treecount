@@ -10,14 +10,12 @@ def create_bar(height, width, color):
     return bar, (red, green, blue)
 
 
-class Image:
-    """
-    img = np.array()
-    imgRGB = np.array()
-    dominantColors = np.array()
-    meanColor = np.array()
-    """
+def normalize(array):
+    array_min, array_max = array.min(), array.max()
+    return (array - array_min) / (array_max - array_min)
 
+
+class Image:
     def __init__(self, path2img: str, channels=None):
         if channels is None:
             channels = [1, 2, 3]
@@ -32,19 +30,9 @@ class Image:
         self.size = [self.img.shape[1], self.img.shape[2]]
 
     def selectChannels(self, channels):
-        def normalize(array):
-            array_min, array_max = array.min(), array.max()
-            return (array - array_min) / (array_max - array_min)
-
-        # Навести порядок тут с чтением и выбором каналов в изображении
-        res = []
-        for num_channel in channels:
-            layer = normalize(self.img[num_channel-1])
-            res.append(layer)
-        return np.dstack(res)
+        return np.dstack([normalize(self.img[num_channel - 1]) for num_channel in channels])
 
     def getPalette(self, number_colors=5, display=False):
-
         data = np.reshape(self.imgRGB, (self.imgRGB.shape[0] * self.imgRGB.shape[1], self.imgRGB.shape[2]))
         data = data[~np.all(data == 0, axis=1)]
 
@@ -70,10 +58,8 @@ class Image:
             cv2.waitKey(0)
 
     def getColorByCoordinates(self, x: int, y: int):
-        return self.imgRGB[x,y]
+        return self.imgRGB[x, y]
 
     def plot(self):
         plt.imshow(self.imgRGB)
         plt.show()
-
-

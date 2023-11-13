@@ -23,4 +23,4 @@ class CuttingArea:
         self.species_list.append(Species(name, color))
 
     def get_species_colors(self):
-        return [species.colors for species in self.species_list]
+        return [species.mean_color for species in self.species_list]

@@ -36,15 +36,16 @@ def main():
                             [27.5, 24]])
 
     probe = CuttingArea(impath, [3, 2, 7], laspath, las_to_tiff_scaler)
-    probe.image.getPalette(number_colors=number_of_colors, display=False)
+    probe.image.getPalette(number_colors=number_of_colors, display=True)
 
     centers, clusters = probe.pointcloud.getMax(radius=10, eps=7, min_samples=10, divider=15, num_slice=15)
-    z_min = probe.pointcloud.getFloor(radius=1.5)
+    probe.pointcloud.getFloor(radius=1.5)
     sea_level_height = 0
 
     for i, color in enumerate(probe.image.dominantColors):
         probe.add_species(f'{i}', color)
-    species_classifier = KMeans(len(probe.get_species_colors())).fit(probe.get_species_colors())
+        print(i, color)
+    #species_classifier = KMeans(len(probe.get_species_colors())).fit(probe.get_species_colors())
 
     d1 = []
     d2 = []
@@ -52,16 +53,16 @@ def main():
     h = []
     params = diameterextraction.get_params(model_trees)
     for center in centers:
-        height = heightextraction.get_height(center, z_min, sea_level_height, radius=5)
+        height = heightextraction.get_height(center, probe.pointcloud.ground, sea_level_height, radius=5)
         h.append(height)
         diams = diameterextraction.fit_tree(height, params)
         d1.append(diams[0])
         d2.append(diams[1])
         d3.append(diams[2])
         tree_color = probe.image.getColorByCoordinates(center[0],center[1])
-        species = species_classifier.predict(tree_color)
+        #species = species_classifier.predict(tree_color)
         tree = Tree(center, height, diams[0], diams[1], diams[2])
-        tree.addSpecies(species)
+        #tree.addSpecies(species)
         probe.trees.append(tree)
         print(tree)
     print(len(probe.trees))
