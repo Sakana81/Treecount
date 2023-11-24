@@ -9,12 +9,19 @@ import heightextraction
 
 
 def main():
-    #impath = ''
-    #laspath = ''
-    impath = ''
-    laspath = ''
-    las_to_tiff_scaler = 10
+    impath = 'C:\\Users\pickles\Downloads\Telegram Desktop\LYSVA_RGB_NIR_9\LYSVA_RGB_NIR_9.tif'
+    laspath = 'C:\\Users\pickles\Downloads\Telegram Desktop\LYSVA_RGB_NIR_9\Lysva_may_PP9_D_G_O.las'
+    las_to_tiff_scaler = 10000
     number_of_colors = 5
+    radius_top = 50
+    eps_top = 0.7
+    min_samples_top = 3
+    divider_point_cloud = 15
+    num_slice_point_cloud = 15
+    radius_bottom = 1.5
+    sea_level_height = 0
+
+
     # ЭТО ДЛЯ ПРИМЕРА! необходимо подгружать от пользователя в таком же формате: [[диаметр (см), высота(м)],[диаметр(см), высота(м)],...]
     model_trees = np.array([[8.45, 11.1],
                             [7.95, 11.4],
@@ -38,9 +45,12 @@ def main():
     probe = CuttingArea(impath, [3, 2, 7], laspath, las_to_tiff_scaler)
     probe.image.getPalette(number_colors=number_of_colors, display=True)
 
-    centers, clusters = probe.pointcloud.getMax(radius=10, eps=7, min_samples=10, divider=15, num_slice=15)
-    probe.pointcloud.getFloor(radius=1.5)
-    sea_level_height = 0
+    centers, clusters = probe.pointcloud.getMax(radius=radius_top,
+                                                eps=eps_top,
+                                                min_samples=min_samples_top,
+                                                divider=divider_point_cloud,
+                                                num_slice=num_slice_point_cloud)
+    probe.pointcloud.getFloor(radius=radius_bottom)
 
     for i, color in enumerate(probe.image.dominantColors):
         probe.add_species(f'{i}', color)

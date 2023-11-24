@@ -11,7 +11,8 @@ class PointCloud:
 
     def __init__(self, path2las: str, scaler):
         las = laspy.read(path2las)
-        point_data = (las.xyz - [las.header.x_min, las.header.y_min, las.header.z_min]) * [scaler, scaler, scaler]
+        self.scalers = [las.header.x_scale * scaler, las.header.y_scale * scaler, las.header.z_scale * scaler]
+        point_data = (las.xyz - [las.header.x_min, las.header.y_min, las.header.z_min]) * self.scalers
         self.size = [max(point_data[:, 0]), max(point_data[:, 1]), max(point_data[:, 2])]
         self.las = point_data[point_data[:, 2].argsort()]
         self.slice = np.empty(0)
